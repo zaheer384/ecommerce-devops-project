@@ -1,0 +1,89 @@
+# docker-compose.yml - Defines our multi-container application
+
+version: '3.8'
+
+# Define services (containers) needed for our application
+services:
+  
+  # PostgreSQL Database Container
+  database:
+    image: postgres:14-alpine  # Official PostgreSQL image (lightweight)
+    container_name: product-database
+    
+    # Environment variables for database configuration
+    environment:
+      POSTGRES_DB: productsdb        # Database name
+      POSTGRES_USER: postgres        # Database username
+      POSTGRES_PASSWORD: password    # Database password (use secrets in production!)
+      POSTGRES_HOST_AUTH_METHOD: trust
+    
+    # Volume to persist database data
+    # Even if container stops, data remains saved
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+    # Port mapping: host_port:container_port
+    ports:
+      - "5432:5432"
+    
+    # Health check to ensure database is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Network for container communication
+    networks:
+      - app-network
+
+  # Flask Application Container
+  app:
+    build:
+      context: .              # Build from current directory
+      dockerfile: Dockerfile  # Use our Dockerfile
+    
+    container_name: product-api
+    
+    # Environment variables for app configuration
+    environment:
+      DB_HOST: database       # Hostname of database service
+      DB_PORT: 5432
+      DB_NAME: productsdb
+      DB_USER: postgres
+      DB_PASS: password
+      FLASK_ENV: development
+    
+    # Port mapping: access app at http://localhost:5000
+    ports:
+      - "5001:5000"
+    
+    # Wait for database to be healthy before starting app
+    depends_on:
+      database:
+        condition: service_healthy
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Network for container communication
+    networks:
+      - app-network
+    
+    # Mount code directory for development
+    # Changes to code reflect immediately without rebuilding
+    volumes:
+      - ./app.py:/app/app.py
+
+# Define named volumes for data persistence
+volumes:
+  postgres_data:
+    driver: local
+
+# Define network for container communication
+networks:
+  app-network:
+    driver: bridge
