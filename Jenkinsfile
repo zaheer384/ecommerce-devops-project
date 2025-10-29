@@ -145,25 +145,3 @@ pipeline {
 }
 
 
-### **D. Paste and Save**
-
-1. Paste the content into the new file in VS Code
-2. Click **File → Save** (or press `Cmd+S`)
-3. Save as: `Jenkinsfile` (no extension, capital J)
-4. Make sure you're saving it in the root of your project folder: `ecommerce-devops-project`
-
----
-
-## **Step 2: Verify File Structure**
-
-In VS Code's Explorer (left sidebar), you should now see:
-```
-ecommerce-devops-project/
-├── .dockerignore
-├── .gitignore
-├── app.py
-├── docker-compose.yml
-├── Dockerfile
-├── Jenkinsfile          ← NEW FILE!
-├── README.md
-└── requirements.txt
