@@ -63,7 +63,7 @@ pipeline {
         
         // Stage 4: Code Quality Analysis with SonarQube (optional)
         // Uncomment when we set up SonarQube
-        /*
+        
         stage('SonarQube Analysis') {
             steps {
                 echo '📊 Running code quality analysis...'
@@ -75,7 +75,7 @@ pipeline {
                 }
             }
         }
-        */
+        
         
         // Stage 5: Push to Docker Hub
         stage('Push to Docker Hub') {
